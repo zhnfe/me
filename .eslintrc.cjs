@@ -37,6 +37,15 @@ module.exports = {
       ignores: []
     }],
     'vue/singleline-html-element-content-newline': 'off',
-    'vue/multi-word-component-names': 'off'
+    'vue/multi-word-component-names': 'off',
+    'vue/html-self-closing': ['error', {
+      html: {
+        void: 'never',
+        normal: 'never',
+        component: 'always'
+      },
+      svg: 'always',
+      math: 'always'
+    }]
   }
 }

@@ -1,4 +1,7 @@
 <template>
-  <h1 style="text-align: center;">Home</h1>
+  <h1 class="text-center">Home</h1>
   <nuxt-link to="/demo">demo</nuxt-link>
 </template>
+
+<style lang="scss">
+</style>

@@ -1,41 +1,156 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
+import { assignObject } from '~/utils'
 import { tabs } from '@/config'
 
-const state = reactive({
-  currentIndex: 0
-})
-interface DomsInfo {
-  width: number;
-  x: number;
+useHead({ title: () => '小黑盒 tab' })
+
+interface DomInfo {
+  width: number
+  x: number
 }
+
+const state = reactive({
+  currentIndex: 0,
+  canTransition: true
+})
+
+const navContainerRef = ref<HTMLDivElement>()
+const navRef = ref<HTMLDivElement>()
 const navItemsRef = ref<HTMLDivElement[]>()
-const tabItemsRef = ref<HTMLDivElement[]>()
-const tabDomsInfo: DomsInfo[] = []
+const slider = ref<HTMLDivElement>()
+const contentRef = ref<HTMLDivElement>()
+const navDomsInfo: DomInfo[] = []
+
+function handleTabClick(index: number) {
+  const tabInfo = navDomsInfo[index]
+  state.currentIndex = index
+  navContainerRef.value?.scroll({
+    top: 0,
+    left: tabInfo.x + tabInfo.width / 2 - start.width / 2,
+    behavior: 'smooth'
+  })
+  // slider相关
+  slider.value!.style.width = `${tabInfo.width}px`
+  slider.value!.style.transform = `translateX(${tabInfo.x - navDomsInfo[0].x}px)`
+  // 颜色
+  navRef.value!.style.clipPath = `inset(0 ${start.navWidth - tabInfo.x - tabInfo.width}px 0 ${tabInfo.x}px)`
+}
+
+const start = {
+  /** 视口宽度 */
+  width: 0,
+  x: 0,
+  y: 0,
+  time: 0,
+  index: 0,
+  navWidth: 0
+}
+
+function handleTouchStart(e: TouchEvent) {
+  state.canTransition = false
+  const touch = e.touches[0]
+  assignObject(start, {
+    navWidth: navRef.value!.clientWidth,
+    width: window.innerWidth,
+    x: touch.pageX,
+    y: touch.pageY,
+    time: Date.now(),
+    index: state.currentIndex
+  })
+  // 初始化 move
+  assignObject(move, {
+    time: 0,
+    x: 0,
+    y: 0
+  })
+}
+
+const move = {
+  x: 0,
+  y: 0,
+  time: 0,
+  canceled: false,
+  scrolling: false
+}
+function handleTouchMove(e: TouchEvent) {
+  if (move.scrolling) {
+    return
+  }
+  const touch = e.touches[0]
+  assignObject(move, {
+    x: touch.pageX - start.x,
+    y: touch.pageY - start.y
+  })
+  if (Math.abs(move.y) > Math.abs(move.x)) {
+    move.scrolling = true
+    return
+  }
+  // 部分浏览器不阻止默认行为会导致滑动卡顿, 缓慢滑动时尤为明显
+  e.preventDefault()
+  /** 边界情况, distance 为 contents 应该移动的距离 */
+  const distance = move.x - start.index * start.width
+  if (distance > 0 || distance < -start.width * (tabs.length - 1)) {
+    move.canceled = true
+    return
+  }
+  contentRef.value!.style.transform = `translateX(${distance}px)`
+  const tabInfo = navDomsInfo[start.index]
+  const nextTabInfo = navDomsInfo[move.x > 0 ? start.index -1 : start.index + 1]
+
+  const dx = nextTabInfo.x - tabInfo.x
+  const dWidth = nextTabInfo.width - tabInfo.width
+  const stepX = dx / start.width * Math.abs(move.x)
+  const stepWidth = dWidth / start.width * Math.abs(move.x)
+  // width 下一个的宽度减去当前宽度 + 移动距离比上视口宽度, translateX 同理
+  slider.value!.style.width = `${tabInfo.width + stepWidth}px`
+  slider.value!.style.transform = `translateX(${(tabInfo.x - navDomsInfo[0].x) + stepX}px)`
+  // 本次需要滚动的距离
+  const scrollDistance = dx+ dWidth / 2
+  // 本次滚动起点
+  const scrollStartX = (tabInfo.x + tabInfo.width / 2) - start.width / 2
+  /** move.x / start.width = x / scrollDistance
+   * => x = Math.abs(move.x) / start.width * scrollDistance
+   * 方向由 scrollDistance 决定 */
+  navContainerRef.value!.scroll(Math.abs(move.x) / start.width * scrollDistance + scrollStartX, 0)
+
+  // 颜色
+  navRef.value!.style.clipPath = `inset(0 ${start.navWidth - (tabInfo.x + tabInfo.width + stepX + stepWidth)}px 0 ${tabInfo.x + dx / start.width * Math.abs(move.x)}px)`
+}
+function handleTouchEnd() {
+  state.canTransition = true
+  if (move.canceled || move.scrolling) {
+    move.canceled = false
+    move.scrolling = false
+    return
+  }
+  move.time = Date.now() - start.time
+  const { x, time } = move
+  if (Math.abs(x) > 0.6 * start.width || (time < 200 && Math.abs(x) > 50)) {
+    if (x > 0) {
+      state.currentIndex--
+    } else {
+      state.currentIndex++
+    }
+  } else {
+    //  currentIndex 更改一次 触发渲染
+    state.currentIndex = start.index - 1
+    state.currentIndex = start.index
+  }
+  handleTabClick(state.currentIndex)
+}
 
 onMounted(() => {
-  tabItemsRef.value?.slice(0, tabs.length).forEach(item => {
-    const rect = item.getBoundingClientRect()
-    tabDomsInfo.push({
-      width: rect.width,
-      x: rect.x
+  navItemsRef.value?.forEach(item => {
+    // 保存各个tab的宽度和距左侧的位置
+    navDomsInfo.push({
+      width: item.clientWidth,
+      x: item.offsetLeft
     })
   })
-  console.log(tabDomsInfo)
+  start.width = window.innerWidth
+  start.navWidth = navRef.value?.clientWidth || 0
 })
-function handleTabClick(e: MouseEvent, index: number) {
-  const target = e.target as HTMLDivElement
-  target.scrollIntoView({
-    behavior: 'smooth',
-    inline: 'center'
-  })
-  const nav = navItemsRef.value![1]
-  const tabInfo = tabDomsInfo[index]
-  nav.style.clipPath = `inset(0 ${tabInfo.x + tabInfo.width}px 0 ${tabInfo.x}px)`
-  console.log(tabInfo)
-  state.currentIndex = index
-}
-
 </script>
 
 <template>
@@ -44,35 +159,77 @@ function handleTabClick(e: MouseEvent, index: number) {
       <h2 class="title">
         小黑盒 tab
       </h2>
-      <div class="nav-container">
-        <nav
-          v-for="num in 2"
-          :key="num"
-          ref="navItemsRef"
-          class="nav"
-        >
-          <div class="tab">
-            <div
-              v-for="item, index in tabs"
-              :key="item.id"
-              ref="tabItemsRef"
-              class="tab-item"
-              @click="(e: MouseEvent) => handleTabClick(e, index)"
-            >
-              {{ item.value }}
-            </div>
+      <div ref="navContainerRef" class="nav-container">
+        <nav class="nav">
+          <div
+            v-for="item, index in tabs"
+            :key="item.id"
+            ref="navItemsRef"
+            class="nav-item"
+            @click="handleTabClick(index)"
+          >
+            {{ item.value }}
           </div>
         </nav>
+        <nav
+          ref="navRef"
+          class="nav"
+          :class="state.canTransition ? 'transition' : ''"
+        >
+          <div
+            v-for="item, index in tabs"
+            :key="item.id"
+            class="nav-item"
+            @click="handleTabClick(index)"
+          >
+            {{ item.value }}
+          </div>
+        </nav>
+        <div
+          ref="slider"
+          class="slider"
+          :class="state.canTransition ? 'transition' : ''"
+        ></div>
       </div>
     </header>
-    <main class="content-container" :style="{ transform: `translateX(-${state.currentIndex * 100}%)` }">
+    <main
+      ref="contentRef"
+      class="content-container"
+      :class="state.canTransition ? 'transition' : ''"
+      :style="{transform: `translateX(-${state.currentIndex * 100}%)`}"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+    >
       <div
         v-for="item in tabs"
         :key="item.id"
-        class="content"
+        class="contents"
       >
-        <div class="content-title">
+        <h1 class="content-title">
           {{ item.value }}
+        </h1>
+        <div class="content">
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perferendis, doloremque ad a pariatur tempore nisi sapiente ea iusto corrupti ex quasi? Corrupti vel quisquam corporis aut eveniet in earum quaerat.
+          Magnam assumenda pariatur aperiam unde ex cupiditate. Quibusdam pariatur autem quidem beatae vel laborum in deserunt fuga distinctio alias. Quasi, quis neque nisi ex eligendi cumque ad saepe illum eos?
+          Non dolorem ipsam incidunt. Velit necessitatibus inventore molestiae ad praesentium, ullam molestias consectetur aut voluptatibus alias perferendis veritatis accusantium aspernatur. Voluptates impedit architecto consequatur nostrum aliquid ea quibusdam fuga debitis.
+          Voluptas rerum unde praesentium sit optio aperiam corporis aut nesciunt hic, nam dolores dolor incidunt quam et nobis nulla id esse omnis illum. Delectus aut repellendus perferendis expedita harum quo.
+          Ratione modi, commodi expedita quos accusantium molestiae quis magni et. Voluptate repudiandae ullam odio unde blanditiis illo dolorum consequuntur laudantium! Tempora, quae? Corrupti tempora debitis consequatur. At nulla magnam quia.
+          Possimus, eligendi dicta? Nam eum quas illo odio aliquam distinctio possimus placeat dicta sunt minus doloremque sed quaerat laudantium excepturi cupiditate exercitationem voluptatem enim asperiores molestiae totam eos, mollitia quam.
+          Minus commodi quae fugit perspiciatis culpa dolorum natus. Placeat voluptates esse libero dolorum ex facilis sunt aut tempore eius, non minus est inventore excepturi provident officiis eligendi. Modi, nihil consequuntur?
+          Praesentium beatae repudiandae, accusamus voluptatem excepturi placeat quasi incidunt, ut explicabo molestias laudantium illum aliquid totam nesciunt quidem assumenda est ea ducimus quaerat corporis ipsa animi facilis at voluptatum. Culpa.
+          Iure tempora porro adipisci eveniet sunt corporis! Totam neque numquam sequi hic natus commodi dolore sunt dolorem voluptatibus nostrum. Porro eaque, veniam possimus consectetur blanditiis sint dolore ex quasi quod?
+          Dolores minus ea iure expedita molestiae, reiciendis harum illo veritatis asperiores, maxime neque exercitationem eius, voluptatem sed eligendi ipsam facilis quaerat rem quas fugit nihil earum iste? Natus, saepe aperiam?
+          Porro doloribus tenetur perferendis ad et, alias perspiciatis fugit, saepe nisi possimus neque! Fuga, ipsam velit corporis harum, ipsa blanditiis iusto, tempore esse culpa laboriosam cupiditate maxime quisquam repellat modi.
+          Incidunt quas nesciunt nostrum quis, ipsum explicabo recusandae voluptas nihil sapiente quaerat minima sequi laborum dolores harum amet optio, quos possimus exercitationem veritatis debitis blanditiis. Necessitatibus esse delectus vitae nulla.
+          Vero nisi enim suscipit at? Sit voluptate facilis magnam rem, distinctio debitis molestias ea, saepe ducimus ullam, quibusdam explicabo atque maxime? Harum ipsam itaque et odio quae suscipit est officiis.
+          Quis mollitia harum illo nam labore placeat nihil nisi porro veniam cumque deleniti dicta sint in maxime, eius dolore ipsa modi, natus quia ad saepe est. Aliquam rerum perspiciatis quasi!
+          Perferendis deserunt quis voluptatibus adipisci omnis iste culpa? Aut accusamus culpa voluptates illum eligendi officiis incidunt soluta doloribus dignissimos dolore dolorum enim aliquid, quibusdam doloremque repellat id iusto atque quasi?
+          Assumenda molestias amet cum exercitationem earum! Aliquid rem adipisci velit illo voluptas quibusdam a, enim maxime dolor hic ipsa iusto vel. Id laudantium velit cum quasi vero recusandae odit dolore!
+          Est nulla vel saepe, ullam reiciendis, possimus ad labore consequatur fugiat vitae, quod in eaque. Voluptates illo ad porro quaerat beatae? Voluptates minus nemo eos tempora nisi cumque quaerat. Placeat?
+          Aut quam vel, et fuga veritatis repellendus unde? Provident beatae officia, magnam velit ducimus autem nihil reiciendis cupiditate praesentium suscipit quis officiis eaque tempora eveniet odio. Quod quos a odit?
+          Dolorem sit aspernatur, sunt voluptatem voluptates vel? Doloribus deserunt, aliquid voluptatum voluptatibus laborum eum quam a corrupti et ad quisquam officiis assumenda facilis voluptas nulla omnis magnam porro rerum qui!
+          Officia molestias a itaque recusandae fugiat hic. Impedit laborum cumque odit repellat deleniti. Sit, rem eveniet voluptatem vel recusandae deserunt ad, unde totam quaerat ab doloremque ut iusto, accusamus modi?
         </div>
       </div>
     </main>
@@ -80,6 +237,10 @@ function handleTabClick(e: MouseEvent, index: number) {
 </template>
 
 <style lang="scss" scoped>
+$common-transition: all .25s ease-out;
+.transition {
+  transition: $common-transition;
+}
 .black-box {
   --bg-color: #fff;
   --color: #222;
@@ -100,73 +261,87 @@ function handleTabClick(e: MouseEvent, index: number) {
 }
 
 .black-box {
-  max-width: 480px;
-  overflow: hidden;
-  margin: auto;
   position: fixed;
   inset: 0;
   z-index: 2;
   background-color: var(--bg-color);
   color: var(--color);
+  font-size: 15px;
 }
 
 .header {
-  position: sticky;
-  top: 0;
-
   .title {
     margin: 0;
-    padding: 20px 0;
+    padding: 12px 0 8px;
+    font-size: 22px;
     text-align: center;
   }
 
   .nav-container {
-    margin: 0 10px;
     position: relative;
     overflow-x: scroll;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
+    position: relative;
     .nav {
+      display: inline-flex;
+      column-gap: 15px;
+      white-space: nowrap;
+      padding: 10px 10px 12px;
       color: var(--color-deactive);
-
-      .tab {
-        display: flex;
-        column-gap: 10px;
-
-        .tab-item {
-          flex: 0 0 fit-content;
-          line-height: 2.5;
-          transition: color .3s ease-in;
-        }
+      .nav-item {
+        flex: 0;
+        line-height: 1.2;
+        background-clip: text;
+        font-weight: 700;
       }
     }
-
-    .nav:last-child {
+    .nav:last-of-type {
       position: absolute;
-      top: -20px;
+      top: 0;
+      z-index: 1;
+      clip-path: path("M 10 0 L 10 40 L 40 40 L 40 0");
       color: var(--color);
+    }
+    .slider {
+      position: absolute;
+      left: 10px;
+      bottom: 0;
+      height: 2.5px;
+      width: 30px;
+      background-color: var(--color);
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 }
 
 .content-container {
-  height: calc(100% - 110px);
   display: flex;
-  transition: all .3s ease-in-out;
+  height: calc(100% - 91px);
 
-  .content {
+  .contents {
     overflow-y: scroll;
     flex: 0 0 100%;
-    background-color: var(--content-bg-color);
+    background-color: var(--bg-color);
     color: var(--contnet-color);
+    font-family: Inter;
 
     .content-title {
-      margin: 50% 0 0;
+      margin: 10px 0 0;
       text-align: center;
       font-size: 32px;
+    }
+    .content {
+      word-break: break-all;
+      font-size: 20px;
+      line-height: 1.5;
+      padding: 0 20px;
+
+      &:first-letter {
+        font-size: 40px;
+        margin-left: 1em;
+      }
     }
   }
 
