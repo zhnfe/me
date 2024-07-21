@@ -157,6 +157,7 @@ function handleTouchEnd() {
 }
 
 function handleNavTouchMove(e: TouchEvent) {
+  e.preventDefault()
   const touch = e.touches[0]
   assignObject(move, {
     x: touch.pageX - start.x,
