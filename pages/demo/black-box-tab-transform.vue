@@ -8,12 +8,14 @@ useHead({ title: () => '小黑盒 tab' })
 interface DomInfo {
   width: number
   x: number
+  center: number
 }
 
 const state = reactive({
   currentIndex: 0,
   canTransition: true,
   translate: {
+    nav: 0,
     clip: 'path("M 10 0 v 40 h 30 v -40")',
     slider: 0,
     sliderWidth: 30,
@@ -28,22 +30,14 @@ const slider = ref<HTMLDivElement>()
 const contentRef = ref<HTMLDivElement>()
 const navDomsInfo: DomInfo[] = []
 
-function handleTabClick(index: number) {
-  const currentTab = navDomsInfo[index]
-  navContainerRef.value?.scroll({
-    top: 0,
-    left: currentTab.x + currentTab.width / 2 - start.width / 2,
-    behavior: 'smooth'
-  })
-  assignObject(state, {
-    currentIndex: index,
-    translate: {
-      slider: currentTab.x - navDomsInfo[0].x,
-      sliderWidth: currentTab.width,
-      content: `-${index * 100}%`,
-      clip: `path('M ${currentTab.x} 0 v 40 h ${currentTab.width} v -40')`
-    }
-  })
+function _getNavContainerTranslate (translateX: number) {
+  if (translateX > 0) {
+    return 0
+  }
+  if (translateX < start.maxNavContainerTranslate) {
+    return start.maxNavContainerTranslate
+  }
+  return translateX
 }
 
 const start = {
@@ -53,7 +47,9 @@ const start = {
   y: 0,
   time: 0,
   index: 0,
-  navWidth: 0
+  maxNavContainerTranslate: 0,
+  rafId: -1,
+  navStart: 0
 }
 
 const move = {
@@ -64,11 +60,29 @@ const move = {
   scrolling: false,
   transforming: false
 }
-function handleTouchStart(e: TouchEvent) {
+function handleTabClick(index: number) {
+  const currentTab = navDomsInfo[index]
+  assignObject(state, {
+    currentIndex: index,
+    translate: {
+      // nav container 应该滚动的距离, 保证当前项尽可能居中
+      nav: _getNavContainerTranslate(start.width / 2 - currentTab.center),
+      slider: currentTab.x - navDomsInfo[0].x,
+      sliderWidth: currentTab.width,
+      content: `-${index * 100}%`,
+      clip: `path('M ${currentTab.x} 0 v 40 h ${currentTab.width} v -40')`
+    }
+  })
+}
+
+function handleTouchStart(e: TouchEvent, target?: 'nav') {
+  if(target === 'nav') {
+    start.navStart = -(navContainerRef.value!.style.transform.match(/\d+(\.\d+)*/)?.[0] || 0)
+    cancelAnimationFrame(start.rafId)
+  }
   state.canTransition = false
   const touch = e.touches[0]
   assignObject(start, {
-    navWidth: navRef.value!.clientWidth,
     width: window.innerWidth,
     x: touch.pageX,
     y: touch.pageY,
@@ -108,7 +122,6 @@ function handleTouchMove(e: TouchEvent) {
     move.canceled = true
     return
   }
-  contentRef.value!.style.transform = `translateX(${distance}px)`
   const currentTab = navDomsInfo[start.index]
   const nextTab = navDomsInfo[move.x > 0 ? start.index -1 : start.index + 1]
 
@@ -116,17 +129,9 @@ function handleTouchMove(e: TouchEvent) {
   const dWidth = nextTab.width - currentTab.width
   const stepX = dx / start.width * Math.abs(move.x)
   const stepWidth = dWidth / start.width * Math.abs(move.x)
-  // 本次需要滚动的距离
-  const scrollDistance = dx + dWidth / 2
-  // 本次滚动起点
-  const scrollStartX = (currentTab.x + currentTab.width / 2) - start.width / 2
-  /** move.x / start.width = x / scrollDistance
-   * => x = Math.abs(move.x) / start.width * scrollDistance
-   * 方向由 scrollDistance 决定 */
-  navContainerRef.value!.scroll(Math.abs(move.x) / start.width * scrollDistance + scrollStartX, 0)
-
   assignObject(state, {
     translate: {
+      nav: _getNavContainerTranslate(start.width / 2 - currentTab.center - stepX),
       slider: (currentTab.x - navDomsInfo[0].x) + stepX,
       sliderWidth: currentTab.width + stepWidth,
       content: `${distance}px`,
@@ -141,7 +146,7 @@ function handleTouchEnd() {
   }
   move.time = Date.now() - start.time
   const { x, time } = move
-  if (Math.abs(x) > 0.6 * start.width || (time < 200 && Math.abs(x) > 50)) {
+  if (Math.abs(x) > 0.5 * start.width || (time < 200 && Math.abs(x) > 50)) {
     if (x > 0) {
       state.currentIndex--
     } else {
@@ -151,16 +156,54 @@ function handleTouchEnd() {
   handleTabClick(state.currentIndex)
 }
 
+function handleNavTouchMove(e: TouchEvent) {
+  const touch = e.touches[0]
+  assignObject(move, {
+    x: touch.pageX - start.x,
+    y: touch.pageY - start.y
+  })
+  state.translate.nav = _getNavContainerTranslate(start.navStart + move.x)
+}
+
+function handleNavTouchEnd() {
+  move.time = Date.now() - start.time
+  let speedX = move.x / move.time // 水平方向的速度
+  if (Math.abs(speedX / move.time) < .005) {
+    state.canTransition = true
+    return
+  }
+
+  // 惯性滑动的参数
+  const friction = .94 // 阻力
+  const inertiaInterval = 25 // 时间间隔
+  function inertiaScroll() {
+    if (Math.abs(speedX) < 0.06) {
+      state.canTransition = true
+      return
+    }
+    speedX *= friction
+    move.x += speedX * inertiaInterval
+    const distance = move.x + start.navStart
+    state.translate.nav = _getNavContainerTranslate(distance)
+    start.rafId = requestAnimationFrame(inertiaScroll)
+    if (distance > 0 || distance < start.maxNavContainerTranslate) {
+      cancelAnimationFrame(start.rafId)
+      state.canTransition = true
+    }
+  }
+  inertiaScroll()
+}
 onMounted(() => {
-  navItemsRef.value?.forEach(item => {
+  navItemsRef.value!.forEach(item => {
     // 保存各个tab的宽度和距左侧的位置
     navDomsInfo.push({
-      width: item.clientWidth,
-      x: item.offsetLeft
+      x: item.offsetLeft,
+      center: item.offsetLeft + item.clientWidth / 2,
+      width: item.clientWidth
     })
   })
   start.width = window.innerWidth
-  start.navWidth = navRef.value?.clientWidth || 0
+  start.maxNavContainerTranslate =  start.width - navRef.value!.clientWidth
 })
 </script>
 
@@ -170,7 +213,15 @@ onMounted(() => {
       <h2 class="title">
         小黑盒 tab
       </h2>
-      <div ref="navContainerRef" class="nav-container">
+      <div
+        ref="navContainerRef"
+        class="nav-container"
+        :class="state.canTransition ? 'transition' : ''"
+        :style="{transform: `translateX(${state.translate.nav}px)`}"
+        @touchstart="(e) => handleTouchStart(e, 'nav')"
+        @touchmove="handleNavTouchMove"
+        @touchend="handleNavTouchEnd"
+      >
         <nav class="nav">
           <div
             v-for="item, index in tabs"
@@ -256,7 +307,7 @@ onMounted(() => {
 .transition {
   transition-property: width, transform, clip-path;
   transition-duration: .25s;
-  transition-timing-function: cubic-bezier(0.43, 0.6, 0.55, 0.91);
+  transition-timing-function: ease-out;
 }
 .black-box {
   --bg-color: #fff;
@@ -296,8 +347,8 @@ onMounted(() => {
 
   .nav-container {
     position: relative;
-    overflow-x: scroll;
     scrollbar-width: none;
+    transform: translateX(0);
     .nav {
       display: inline-flex;
       column-gap: 20px;
@@ -313,8 +364,8 @@ onMounted(() => {
     .nav:last-of-type {
       position: absolute;
       top: 0;
+      left: 0;
       z-index: 1;
-      clip-path: path("M 10 0 L 10 40 L 40 40 L 40 0");
       color: var(--color);
     }
     .slider {
