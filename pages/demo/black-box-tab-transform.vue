@@ -211,7 +211,7 @@ onMounted(() => {
   <div class="black-box">
     <header class="header">
       <h2 class="title">
-        小黑盒 tab
+        小黑盒 tab (transform)
       </h2>
       <div
         ref="navContainerRef"
