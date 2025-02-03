@@ -5,6 +5,11 @@ export default defineNuxtConfig({
   features: {
     inlineStyles: false
   },
+  vite: {
+    build: {
+      target: 'esnext'
+    }
+  },
   app: {
     head: {
       viewport: 'width=device-width, initial-scale=1, user-scalable=1',

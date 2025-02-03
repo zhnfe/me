@@ -5,23 +5,22 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --host",
-    "generate": "nuxt generate --prerender",
-    "generateDev": "NODE_ENV=development && nuxt generate --prerender",
+    "generate": "nuxt generate",
+    "generateDev": "NODE_ENV=development && nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "serve": "http-serve dist -p 3001",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --fix"
   },
   "dependencies": {
-    "nuxt": "^3.12.3",
+    "nuxt": "^3.15.4",
     "vue": "latest"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.12.1",
-    "@rushstack/eslint-patch": "^1.10.3",
-    "@vue/eslint-config-typescript": "^13.0.0",
-    "eslint": "8",
-    "eslint-plugin-vue": "^9.27.0",
+    "@vue/eslint-config-typescript": "^14.3.0",
+    "eslint": "^9.19.0",
+    "eslint-plugin-vue": "^9.32.0",
     "sass": "^1.77.8"
-  }
+  },
+  "packageManager": "pnpm@9.5.0+sha1.8c155dc114e1689d18937974f6571e0ceee66f1d"
 }
