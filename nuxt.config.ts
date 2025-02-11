@@ -16,7 +16,8 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1, user-scalable=1',
       htmlAttrs: {
         lang: 'zh'
-      }
+      },
+      meta: [{ name: 'darkreader-lock', content: '' }]
     }
   },
   $production: {

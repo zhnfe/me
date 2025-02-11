@@ -313,7 +313,6 @@ onMounted(() => {
     .nav:last-of-type {
       position: absolute;
       top: 0;
-      z-index: 1;
       clip-path: path("M 10 0 L 10 40 L 40 40 L 40 0");
       color: var(--color);
     }
