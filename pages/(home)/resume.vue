@@ -210,9 +210,6 @@ const onPrint = () => {
     width: 1060px;
     padding: 88px 48px 0;
     box-shadow: none;
-    .link {
-      color: #101010;
-    }
   }
   .name {
     margin: 0 0 20px 0;
