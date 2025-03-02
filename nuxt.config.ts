@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { readFileSync } from 'fs'
+import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     inlineStyles: false
   },
   vite: {
+    plugins: [tailwindcss()],
     build: {
       target: 'esnext'
     }
@@ -24,8 +25,7 @@ export default defineNuxtConfig({
     app: {
       baseURL: '/me',
       head: {
-        link: [{ rel: 'shortcut icon', href: '/me/me.png' }],
-        style: [{ innerHTML: readFileSync('./public/style/index.css').toString() }]
+        link: [{ rel: 'shortcut icon', href: '/me/me.png' }]
       }
     }
   },
@@ -35,9 +35,9 @@ export default defineNuxtConfig({
       head: {
         link: [{ rel: 'shortcut icon', href: '/favicon.ico' }]
       }
-    },
-    css: [
-      '~/public/style/index.css'
-    ]
-  }
+    }
+  },
+  css: [
+    'public/style/index.css'
+  ]
 })

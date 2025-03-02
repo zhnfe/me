@@ -336,6 +336,7 @@ onMounted(() => {
   height: calc(100% - 91px);
 
   .contents {
+    display: block;
     overflow-y: scroll;
     flex: 0 0 100%;
     background-color: var(--bg-color);
