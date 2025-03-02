@@ -21,11 +21,11 @@ const onPrint = () => {
       <span>生日：1997/07</span>
       <span class="text-gray-500 mx-2 scale-y-85 inline-block">|</span>
       <a class="text-cyan-600 mr-2" href="tel:(+86)18373351542">
-        <i class="i-icon align-text-top" style="--icon: url('/icons/tel.min.svg')"></i>
+        <i class="i-icon" style="--icon: url('../../icons/tel.min.svg')"></i>
         <span> 18373351542</span>
       </a>
       <a class="text-cyan-600" href="mailto:work.haonan@gmail.com">
-        <span class="i-icon" style="--icon: url('/icons/gmail.min.svg')"></span>
+        <span class="i-icon" style="--icon: url('../../icons/gmail.min.svg')"></span>
         <span> work.haonan@gmail.com</span>
       </a>
     </p>
