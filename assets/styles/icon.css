@@ -1,0 +1,19 @@
+[class^="i-icon"] {
+  --un-icon: var(--icon);
+  -webkit-mask: var(--un-icon) no-repeat;
+  mask: var(--un-icon) no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  color: inherit;
+  display: inline-block;
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: text-bottom;
+}
+.i-icon-gmail {
+  --un-icon: url(../icons/gmail.min.svg);
+}
+.i-icon-tel {
+  --un-icon: url(../icons/tel.min.svg);
+}

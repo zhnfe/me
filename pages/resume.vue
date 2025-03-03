@@ -10,11 +10,10 @@ useHead({
 const onPrint = () => {
   print()
 }
-const base = import.meta.env.PROD ? '/me/' : '/'
 </script>
 
 <template>
-  <main class="max-w-5xl mx-auto pt-20 px-5 text-base shadow-md mt-4 print:px-12 print:shadow-none print:w-5xl page:ml-0">
+  <main class="max-w-5xl mx-auto py-20 px-5 text-base shadow-md mt-4 print:px-12 print:pb-0 print:shadow-none print:w-5xl page:ml-0">
     <h1 class="text-3xl mb-3 font-semibold" @click="onPrint">郑浩南-web前端开发工程师（4年）</h1>
     <p class="text-gray-700">
       <span>湖南工业大学-本科 2017 - 2021</span>
@@ -22,11 +21,11 @@ const base = import.meta.env.PROD ? '/me/' : '/'
       <span>生日：1997/07</span>
       <span class="text-gray-500 mx-2 scale-y-85 inline-block">|</span>
       <a class="text-cyan-600 mr-2" href="tel:(+86)18373351542">
-        <i class="i-icon" :style="`--icon: url('${base}icons/tel.min.svg')`"></i>
+        <i class="i-icon-tel"></i>
         <span> 18373351542</span>
       </a>
       <a class="text-cyan-600" href="mailto:work.haonan@gmail.com">
-        <i class="i-icon" :style="`--icon: url('${base}icons/gmail.min.svg')`"></i>
+        <i class="i-icon-gmail"></i>
         <span> work.haonan@gmail.com</span>
       </a>
     </p>
