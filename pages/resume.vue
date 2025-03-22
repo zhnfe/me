@@ -1,46 +1,55 @@
 <script lang="ts" setup>
+const info = {
+  name: '郑浩南',
+  email: 'work.haonan@gmail.com'
+}
 useHead({
-  title: '郑浩南-web前端开发工程师(4年)',
+  title: `${info.name} - web前端开发工程师(4年)`,
   meta: [
-    { name: 'keywords', content: '郑浩南,web前端,前端工程师,简历,web前端个人简历,前端开发,前端简历,最新简历,前端博客,热前端,设计,FE,github,求职,react,vue,resume' },
-    { name: 'description', content: '前端开发工程师郑浩南的个人简历' },
+    { name: 'keywords', content: `${info.name},web前端,前端工程师,简历,web前端个人简历,前端开发,前端简历,最新简历,前端博客,热前端,设计,FE,github,求职,react,vue,resume` },
+    { name: 'description', content: `前端开发工程师${info.name}的个人简历` },
     { name: 'theme-color', content: 'darkred' }
   ]
 })
+const titleLineStyles = 'after:-z-10 after:w-10/12 after:right-0 after:top-1/2 after:border-t after:border-gray-200'
+
 const onPrint = () => {
   print()
 }
 </script>
 
 <template>
-  <main class="max-w-5xl mx-auto py-20 px-5 text-base shadow-md mt-4 print:px-12 print:pb-0 print:shadow-none print:w-5xl page:ml-0">
-    <h1 class="text-3xl mb-3 font-semibold" @click="onPrint">郑浩南-web前端开发工程师（4年）</h1>
-    <p class="text-gray-700">
-      <span>湖南工业大学-本科 2017 - 2021</span>
+  <main class="max-w-5xl mx-auto pt-10 pb-20 px-5 text-base shadow-lg mt-4 print:px-12 print:pb-0 print:shadow-none print:w-5xl page:ml-0">
+    <h1 class="text-3xl mb-3 font-semibold" @click="onPrint">{{ info.name }} - web前端开发工程师</h1>
+    <p>
+      <span>湖南工业大学</span>
+      <span class="text-gray-500 mx-2 scale-y-85 inline-block">|</span>
+      <span>统招本科 2017 - 2021</span>
       <span class="text-gray-500 mx-2 scale-y-85 inline-block">|</span>
       <span>生日：1997/07</span>
       <span class="text-gray-500 mx-2 scale-y-85 inline-block">|</span>
       <a class="text-cyan-600 mr-2" href="tel:(+86)18373351542">
         <i class="i-icon-tel"></i>
-        <span> 18373351542</span>
+        <span>&nbsp;18373351542</span>
       </a>
-      <a class="text-cyan-600" href="mailto:work.haonan@gmail.com">
+      <a class="text-cyan-600" :href="`mailto:${info.email}`">
         <i class="i-icon-gmail"></i>
-        <span> work.haonan@gmail.com</span>
+        <span>&nbsp;{{ info.email }}</span>
       </a>
     </p>
-    <h2 class="relative mt-8 mb-5 text-2xl font-semibold after:absolute after:w-10/12 after:right-0 after:top-1/2 after:border-t after:border-gray-200">
+    <h2 class="relative mt-8 mb-5 text-2xl font-semibold after:absolute" :class="titleLineStyles">
       个人优势
     </h2>
-    <p>4年前端开发经验，熟练掌握现代前端技术栈、框架及组件库。具有良好的代码风格，快速适应并使用新技术的能力。持续关注新技术，同时致力于前端工程化。</p>
+    <p>4 年前端开发经验，熟练掌握现代前端技术栈、框架及组件库。具有良好的代码风格，快速适应并使用新技术的能力。持续关注新技术，同时致力于前端工程化。</p>
     <ul class="my-1.5 list-disc pl-7.5 leading-snug">
-      <li>拥有良好的 ES6、TypeScript、HTML、CSS 基础</li>
-      <li>有完整的 Vue 项目经验、熟练使用 Vue 周边工具、UI框架</li>
-      <li>熟悉 Node.js、有 NestJS、Fastify、MongoDB 开发经验</li>
+      <li>良好的 ES6、TypeScript、HTML、CSS 基础</li>
+      <li>完整的 Vue 项目经验、熟练使用 Vue 周边工具、UI框架</li>
+      <li>熟悉 Node.js，有 NestJS、Fastify、MongoDB 开发经验</li>
       <li>熟悉前端工程化，有 Vite、Rollup 配置经验</li>
+      <li>掌握 Nginx/Apache 静态资源部署，及 Docker、CI/CD 一站式  DevOps 部署</li>
       <li>拥有良好的编码习惯</li>
     </ul>
-    <h2 class="relative mt-8 mb-5 text-2xl font-semibold after:absolute after:w-10/12 after:right-0 after:top-1/2 after:border-t after:border-gray-200">
+    <h2 class="relative mt-8 mb-5 text-2xl font-semibold after:absolute" :class="titleLineStyles">
       工作经历
     </h2>
     <h3 class="my-4 flex gap-x-10 text-[19px]">
@@ -69,9 +78,9 @@ const onPrint = () => {
       <li>据公司项目要求，负责 PC端、移动端的前端设计和研发工作</li>
       <li>根据产品需求，分析并给出合理的页面前端结构解决方案</li>
       <li>根据产品及项目的前端页面编码，利用前端相关技术开发相应应用</li>
-      <li>和后端程序技术有效配合，完成功能的实现和调试工作</li>
+      <li>和后端同学有效配合，完成功能的实现和调试工作</li>
     </ol>
-    <h2 class="relative mt-8 mb-5 text-2xl font-semibold after:absolute after:w-10/12 after:right-0 after:top-1/2 after:border-t after:border-gray-200">
+    <h2 class="relative mt-8 mb-5 text-2xl font-semibold after:absolute" :class="titleLineStyles">
       项目经历
     </h2>
     <h3 class="my-3.5 font-semibold text-lg">搜索运营平台</h3>

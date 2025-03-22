@@ -1,5 +1,5 @@
 [class^="i-icon"] {
-  --un-icon: var(--icon);
+  --un-icon: var(--icon, url(/me.png));
   -webkit-mask: var(--un-icon) no-repeat;
   mask: var(--un-icon) no-repeat;
   -webkit-mask-size: 100% 100%;
@@ -12,8 +12,8 @@
   vertical-align: text-bottom;
 }
 .i-icon-gmail {
-  --un-icon: url(../icons/gmail.min.svg);
+  --icon: url(../icons/gmail.svg);
 }
 .i-icon-tel {
-  --un-icon: url(../icons/tel.min.svg);
+  --icon: url(../icons/tel.svg);
 }
