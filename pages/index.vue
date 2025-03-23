@@ -3,6 +3,3 @@
   <nuxt-link class="text-blue-800" to="/demo">demo</nuxt-link><br>
   <nuxt-link class="text-blue-800" to="/resume">resume</nuxt-link>
 </template>
-
-<style lang="scss">
-</style>
