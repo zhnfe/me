@@ -10,7 +10,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "serve": "http-serve dist -p 3001",
-    "lint": "eslint . --fix"
+    "lint": "eslint --fix"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.9",

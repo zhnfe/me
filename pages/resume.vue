@@ -26,7 +26,7 @@ const onPrint = () => {
 </script>
 
 <template>
-  <main class="max-w-5xl mx-auto text-gray-800 leading-[1.7] p-12 text-base shadow-lg max-md:px-5 print:shadow-none print:w-5xl print:py-0">
+  <main class="max-w-5xl mx-auto text-gray-800 leading-[1.7] p-12 text-base shadow-lg max-md:px-5 print:shadow-none print:w-5xl print:py-0 print:px-12">
     <h1 class="text-3xl mb-4 font-semibold cursor-pointer" @click="onPrint">{{ info.name }}</h1>
     <p>
       <span>web 前端开发工程师</span>

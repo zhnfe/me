@@ -37,6 +37,15 @@ export default defineNuxtConfig({
       }
     }
   },
+  $env: {
+    zhnme: {
+      app: {
+        head: {
+          link: [{ rel: 'shortcut icon', href: '/me.png' }]
+        }
+      }
+    }
+  },
   css: [
     'assets/styles/index.css'
   ]
