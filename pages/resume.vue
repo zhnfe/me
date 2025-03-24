@@ -4,7 +4,7 @@ const info = {
   email: 'work.haonan@gmail.com'
 }
 useHead({
-  title: `${info.name}-web前端开发工程师-4年)`,
+  title: `${info.name}-web前端开发工程师-4年`,
   meta: [
     { name: 'keywords', content: `${info.name},web前端,前端工程师,简历,web前端个人简历,前端开发,前端简历,最新简历,前端博客,热前端,设计,FE,github,求职,react,vue,resume` },
     { name: 'description', content: `前端开发工程师${info.name}的个人简历` },
@@ -26,7 +26,7 @@ const onPrint = () => {
 </script>
 
 <template>
-  <main class="max-w-5xl mx-auto text-gray-800 leading-[1.7] p-12 text-base shadow-lg print:shadow-none print:w-5xl print:py-0">
+  <main class="max-w-5xl mx-auto text-gray-800 leading-[1.7] p-12 text-base shadow-lg max-md:px-5 print:shadow-none print:w-5xl print:py-0">
     <h1 class="text-3xl mb-4 font-semibold cursor-pointer" @click="onPrint">{{ info.name }}</h1>
     <p>
       <span>web 前端开发工程师</span>
@@ -58,16 +58,16 @@ const onPrint = () => {
     <h2 :class="styles.title">
       专业技能
     </h2>
-    <p><strong class="font-medium">前端核心：</strong><span>精通 JavaScript(ES6+)、TypeScript、HTML5、CSS3，熟悉ECMAScript规范与最新特性</span></p>
-    <p><strong class="font-medium">前端框架：</strong><span>深度掌握 Vue 全家桶，具备独立架构设计与项目落地能力</span></p>
-    <p><strong class="font-medium">组件库：</strong><span></span>熟练使用 Element、Ant Design Vue、Naive UI 等组件库</p>
-    <p><strong class="font-medium">样式工具：</strong><span>熟练使用 Sass/Less 等预处理器，精通 Tailwind CSS、UnoCSS 等原子化 CSS 框架，擅长CSS模块化与组件设计</span></p>
-    <p><strong class="font-medium">后端能力：</strong><span>熟悉Node.js生态，具备 NestJS、Fastify 和 MongoDB 实战经验</span></p>
-    <p><strong class="font-medium">工程化：</strong><span>精通 Vite、Rollup 生态，有插件开发经验，构建优化专长，擅长模块化设计与代码分割</span></p>
-    <p><strong class="font-medium">部署运维：</strong><span>掌握 Nginx/Apache 部署，熟悉 Docker 容器化与 CI/CD 自动化部署流程</span></p>
-    <p><strong class="font-medium">版本控制：</strong><span>精通 Git Flow 工作流，擅长分支管理与多人协作冲突解决</span></p>
-    <p><strong class="font-medium">网络与优化：</strong><span>深入理解 HTTP 协议，熟悉跨域解决方案，了解浏览器渲染原理与前端性能优化</span></p>
-    <p><strong class="font-medium">代码质量：</strong><span>注重代码可维护性，拥有良好编码习惯与架构设计思维</span></p>
+    <p><strong>前端核心：</strong><span>精通 JavaScript(ES6+)、TypeScript、HTML5、CSS3，熟悉ECMAScript规范与最新特性</span></p>
+    <p><strong>前端框架：</strong><span>深度掌握 Vue 全家桶，具备独立架构设计与项目落地能力</span></p>
+    <p><strong>组件库：</strong><span></span>熟练使用 Element、Ant Design Vue、Naive UI 等组件库</p>
+    <p><strong>样式工具：</strong><span>熟练使用 Sass/Less 等预处理器，精通 Tailwind CSS、UnoCSS 等原子化 CSS 框架，擅长CSS模块化与组件设计</span></p>
+    <p><strong>后端能力：</strong><span>熟悉Node.js生态，具备 NestJS、Fastify 和 MongoDB 实战经验</span></p>
+    <p><strong>工程化：</strong><span>精通 Vite、Rollup 生态，有插件开发经验，构建优化专长，擅长模块化设计与代码分割</span></p>
+    <p><strong>部署运维：</strong><span>掌握 Nginx/Apache 部署，熟悉 Docker 容器化与 CI/CD 自动化部署流程</span></p>
+    <p><strong>版本控制：</strong><span>精通 Git Flow 工作流，擅长分支管理与多人协作冲突解决</span></p>
+    <p><strong>网络与优化：</strong><span>深入理解 HTTP 协议，熟悉跨域解决方案，了解浏览器渲染原理与前端性能优化</span></p>
+    <p><strong>代码质量：</strong><span>注重代码可维护性，拥有良好编码习惯与架构设计思维</span></p>
     <h2 :class="styles.title">
       工作经历
     </h2>
